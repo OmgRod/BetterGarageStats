@@ -1,0 +1,24 @@
+{
+	"geode": "4.2.0",
+	"gd": {
+		"win": "2.2074",
+		"android": "2.2074",
+		"mac": "2.2074",
+		"ios": "2.2074"
+	},
+	"id": "omgrod.bettergaragestats",
+	"name": "BetterGarageStats",
+	"version": "v1.0.0",
+	"developer": "OmgRod",
+	"description": "Adds advanced profile stats to the icon kit!",
+	"dependencies": {
+		"geode.node-ids": {
+			"version": ">=v1.19.0",
+			"importance": "required"
+		},
+		"capeling.garage-stats-menu": {
+			"version": ">=v1.0.2",
+			"importance": "required"
+		}
+	}
+}
