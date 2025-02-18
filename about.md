@@ -1,3 +1,8 @@
-# Template Mod
+# Better Garage Stats
 
-Edit about.md to change this
+This mod adds extra stats to the sidebar in the icon kit area! These include:
+
+- Demons
+- Demon Keys
+- Gold Keys
+- Achievements (soon...)
