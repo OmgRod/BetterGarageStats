@@ -8,7 +8,7 @@
 	},
 	"id": "omgrod.bettergaragestats",
 	"name": "BetterGarageStats",
-	"version": "v1.0.0",
+	"version": "v1.0.1",
 	"developer": "OmgRod",
 	"description": "Adds advanced profile stats to the icon kit!",
 	"dependencies": {
