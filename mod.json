@@ -20,5 +20,38 @@
 			"version": ">=v1.0.2",
 			"importance": "required"
 		}
+	},
+	"settings": {
+		"demons": {
+			"name": "Show Demons",
+			"type": "bool",
+			"default": true,
+			"description": "Show the amount of demons you have."
+		},
+		"demonKeys": {
+			"name": "Show Demon Keys",
+			"type": "bool",
+			"default": true,
+			"description": "Show the amount of demon keys you have."
+		},
+		"goldKeys": {
+			"name": "Show Gold Keys",
+			"type": "bool",
+			"default": true,
+			"description": "Show the amount of gold keys you have."
+		},
+		"show-shards": {
+			"name": "Show Shards",
+			"type": "bool",
+			"default": false,
+			"description": "Show the amount of each shard you have."
+		},
+		"show-shards-completed": {
+			"name": "Show Completed Shards",
+			"type": "bool",
+			"default": false,
+			"description": "Show completed shards.",
+			"enable-if": "show-shards"
+		}
 	}
 }
