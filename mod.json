@@ -40,6 +40,12 @@
 			"default": true,
 			"description": "Show the amount of gold keys you have."
 		},
+		"creatorPoints": {
+			"name": "Show Creator Points",
+			"type": "bool",
+			"default": true,
+			"description": "Show the amount of creator points you have."
+		},
 		"show-shards": {
 			"name": "Show Shards",
 			"type": "bool",
@@ -53,5 +59,10 @@
 			"description": "Show completed shards.",
 			"enable-if": "show-shards"
 		}
+	},
+	"resources": {
+		"sprites": [
+			"res/*.png"
+		]
 	}
 }

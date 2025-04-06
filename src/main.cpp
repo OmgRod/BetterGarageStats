@@ -1,7 +1,6 @@
-#include "Geode/binding/AchievementManager.hpp"
-#include "Geode/binding/GameManager.hpp"
-#include "Geode/cocos/label_nodes/CCLabelBMFont.h"
 #include <Geode/Geode.hpp>
+#include <Geode/utils/web.hpp>
+#include <Geode/cocos/label_nodes/CCLabelBMFont.h>
 #include <Geode/modify/GJGarageLayer.hpp>
 #include <capeling.garage-stats-menu/include/StatsDisplayAPI.h>
 
@@ -11,17 +10,18 @@ class $modify(MyGJGarageLayer, GJGarageLayer) {
 public:
     struct Fields {
         ProfilePage* m_profilePopup = ProfilePage::create(GJAccountManager::sharedState()->m_accountID, true);
+        EventListener<web::WebTask> m_listener;
     };
 
     bool init() {
         if (!GJGarageLayer::init()) {
             return false;
         }
-
-        auto statMenu = this->getChildByID("capeling.garage-stats-menu/stats-menu");
+        
         auto demons = StatsDisplayAPI::getNewItem("demons"_spr, CCSprite::createWithSpriteFrameName("GJ_demonIcon_001.png"), GameStatsManager::sharedState()->getStat("5"));
         auto demonKeys = StatsDisplayAPI::getNewItem("demon-keys"_spr, CCSprite::createWithSpriteFrameName("GJ_bigKey_001.png"), GameStatsManager::sharedState()->getStat("21"), 0.375);
         auto goldKeys = StatsDisplayAPI::getNewItem("gold-keys"_spr, CCSprite::createWithSpriteFrameName("GJ_bigGoldKey_001.png"), GameStatsManager::sharedState()->getStat("43"), 0.375);
+        if (Mod::get()->getSettingValue<bool>("creatorPoints")) MyGJGarageLayer::refreshCP(nullptr, false);
         auto achievements = StatsDisplayAPI::getNewItem("achievements"_spr, CCSprite::createWithSpriteFrameName("rankIcon_top10_001.png"), 0, 0.5);
 
         auto fireShard = StatsDisplayAPI::getNewItem("fire-shards"_spr, CCSprite::createWithSpriteFrameName("fireShardBig_001.png"), GameStatsManager::sharedState()->getStat("18"), 0.35);
@@ -44,7 +44,7 @@ public:
         //     achLabel->setString(fmt::format("{}%", this->getAllAchievementsPercent()).c_str());  // Set the achievements percentage
         // }
 
-        if (statMenu) {
+        if (auto statMenu = this->getChildByID("capeling.garage-stats-menu/stats-menu")) {
             if (Mod::get()->getSettingValue<bool>("demons")) statMenu->addChild(demons);
             if (Mod::get()->getSettingValue<bool>("demonKeys")) {
                 // if (Mod::get()->getSettingValue<bool>("complete-demon-keys")) {
@@ -139,5 +139,98 @@ private:
         }
 
         return achievementPercent;
+    }
+
+    void refreshCPWrapper(CCObject* sender) {
+        this->refreshCP(sender, true);
+    }
+
+    void refreshCP(CCObject* sender, bool notifySuccess = false) {
+        auto statMenu = this->getChildByID("capeling.garage-stats-menu/stats-menu");
+        statMenu->removeChildByID("creator-points-container"_spr);
+
+        int accID = GJAccountManager::get()->m_accountID;
+        if (accID == 0) {
+            log::debug("Invalid account ID.");
+            return;
+        }
+
+        std::string url = "https://www.boomlings.com/database/getGJUserInfo20.php";
+        std::string secret = "Wmfd2893gb7";
+        std::string targetAccountID = std::to_string(accID);
+
+        web::WebRequest request;
+        request.bodyString("secret=" + secret + "&targetAccountID=" + targetAccountID);
+        request.userAgent("");
+
+        m_fields->m_listener.bind([=](web::WebTask::Event* e) {
+            if (!e->getValue()) {
+                if (e->isCancelled()) {
+                    log::error("The request was cancelled.");
+                } else {
+                    log::error("Request failed.");
+                }
+                
+                return;
+            }
+
+            web::WebResponse* res = e->getValue();
+            if (!res->ok()) {
+                log::error("Request failed with status code: {}", res->code());
+                
+                return;
+            }
+
+            std::string responseBody = res->string().unwrap();
+            size_t start_pos = responseBody.find(":8:");
+            if (start_pos == std::string::npos) {
+                log::error("Failed to find ':8:' in response: {}", responseBody);
+                
+                return;
+            }
+
+            size_t end_pos = responseBody.find(":", start_pos + 3);
+            if (end_pos == std::string::npos || end_pos <= start_pos + 3) {
+                log::error("Failed to find valid end position for creator points in response: {}", responseBody);
+                
+                return;
+            }
+
+            std::string creatorPointsStr = responseBody.substr(start_pos + 3, end_pos - start_pos - 3);
+            if (!std::all_of(creatorPointsStr.begin(), creatorPointsStr.end(), ::isdigit)) {
+                log::error("Parsed creator points is not a valid number: {}", creatorPointsStr);
+                
+                return;
+            }
+
+            int creatorPoints = std::stoi(creatorPointsStr);
+
+            auto myStatItem = StatsDisplayAPI::getNewItem(
+                "creator-points"_spr,
+                CCSprite::create("cpIcon.png"_spr),
+                creatorPoints,
+                1.f
+            );
+
+            if (statMenu) {
+                auto btn = CCMenuItemSpriteExtra::create(
+                    CCSprite::create("cpIcon.png"_spr),
+                    this,
+                    menu_selector(MyGJGarageLayer::refreshCPWrapper)
+                );
+                btn->setID("creator-points-button");
+
+                myStatItem->getChildByID("creator-points-icon"_spr)->setVisible(false);
+                myStatItem->addChild(btn);
+                statMenu->addChild(myStatItem);
+                statMenu->updateLayout();
+
+                if (notifySuccess) {
+                    geode::Notification::create("Creator Points successfully updated.", geode::NotificationIcon::Success, 2.5)->show();
+                }
+            }
+        });
+
+        m_fields->m_listener.setFilter(request.post(url));
     }
 };
