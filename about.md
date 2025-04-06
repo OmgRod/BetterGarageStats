@@ -7,5 +7,6 @@ This mod adds extra stats to the sidebar in the icon kit area! These include:
 - Demons
 - Demon Keys
 - Gold Keys
-- Shards (incomplete and complete)
-- Achievements (soon...)
+- Creator Points (click to refresh)
+- Shards
+- ~~Achievements (soon...)~~

@@ -1,3 +1,7 @@
+# v1.0.2
+
+- Add Creator Points
+
 # v1.0.1
 
 - Shards
