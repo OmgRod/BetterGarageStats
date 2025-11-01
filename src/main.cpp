@@ -71,25 +71,25 @@ public:
                     // statMenu->addChild(bonusShard2);
 
                     if (auto label = typeinfo_cast<CCLabelBMFont*>(fireShard->getChildByID("fire-shards-label"_spr)))
-                        if (GameStatsManager::sharedState()->getStat("18") == 100) label->setColor(ccc3(0, 255, 0));
+                        if (GameStatsManager::sharedState()->getStat("18") >= 100) label->setColor(ccc3(0, 255, 0));
                     if (auto label = typeinfo_cast<CCLabelBMFont*>(iceShard->getChildByID("ice-shards-label"_spr)))
-                        if (GameStatsManager::sharedState()->getStat("19") == 100) label->setColor(ccc3(0, 255, 0));
+                        if (GameStatsManager::sharedState()->getStat("19") >= 100) label->setColor(ccc3(0, 255, 0));
                     if (auto label = typeinfo_cast<CCLabelBMFont*>(poisonShard->getChildByID("poison-shards-label"_spr)))
-                        if (GameStatsManager::sharedState()->getStat("17") == 100) label->setColor(ccc3(0, 255, 0));
+                        if (GameStatsManager::sharedState()->getStat("17") >= 100) label->setColor(ccc3(0, 255, 0));
                     if (auto label = typeinfo_cast<CCLabelBMFont*>(shadowShard->getChildByID("shadow-shards-label"_spr)))
-                        if (GameStatsManager::sharedState()->getStat("16") == 100) label->setColor(ccc3(0, 255, 0));
+                        if (GameStatsManager::sharedState()->getStat("16") >= 100) label->setColor(ccc3(0, 255, 0));
                     if (auto label = typeinfo_cast<CCLabelBMFont*>(lavaShard->getChildByID("lava-shards-label"_spr)))
-                        if (GameStatsManager::sharedState()->getStat("20") == 100) label->setColor(ccc3(0, 255, 0));
+                        if (GameStatsManager::sharedState()->getStat("20") >= 100) label->setColor(ccc3(0, 255, 0));
                     if (auto label = typeinfo_cast<CCLabelBMFont*>(earthShard->getChildByID("earth-shards-label"_spr)))
-                        if (GameStatsManager::sharedState()->getStat("23") == 100) label->setColor(ccc3(0, 255, 0));
+                        if (GameStatsManager::sharedState()->getStat("23") >= 100) label->setColor(ccc3(0, 255, 0));
                     if (auto label = typeinfo_cast<CCLabelBMFont*>(bloodShard->getChildByID("blood-shards-label"_spr)))
-                        if (GameStatsManager::sharedState()->getStat("24") == 100) label->setColor(ccc3(0, 255, 0));
+                        if (GameStatsManager::sharedState()->getStat("24") >= 100) label->setColor(ccc3(0, 255, 0));
                     if (auto label = typeinfo_cast<CCLabelBMFont*>(metalShard->getChildByID("metal-shards-label"_spr)))
-                        if (GameStatsManager::sharedState()->getStat("25") == 100) label->setColor(ccc3(0, 255, 0));
+                        if (GameStatsManager::sharedState()->getStat("25") >= 100) label->setColor(ccc3(0, 255, 0));
                     if (auto label = typeinfo_cast<CCLabelBMFont*>(lightShard->getChildByID("light-shards-label"_spr)))
-                        if (GameStatsManager::sharedState()->getStat("26") == 100) label->setColor(ccc3(0, 255, 0));
+                        if (GameStatsManager::sharedState()->getStat("26") >= 100) label->setColor(ccc3(0, 255, 0));
                     if (auto label = typeinfo_cast<CCLabelBMFont*>(soulShard->getChildByID("soul-shards-label"_spr)))
-                        if (GameStatsManager::sharedState()->getStat("27") == 100) label->setColor(ccc3(0, 255, 0));
+                        if (GameStatsManager::sharedState()->getStat("27") >= 100) label->setColor(ccc3(0, 255, 0));
                 } else {
                     if (GameStatsManager::sharedState()->getStat("18") != 100) statMenu->addChild(fireShard);
                     if (GameStatsManager::sharedState()->getStat("19") != 100) statMenu->addChild(iceShard);
