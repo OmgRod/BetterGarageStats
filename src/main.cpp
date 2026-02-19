@@ -10,7 +10,7 @@ class $modify(MyGJGarageLayer, GJGarageLayer) {
 public:
     struct Fields {
         ProfilePage* m_profilePopup = ProfilePage::create(GJAccountManager::sharedState()->m_accountID, true);
-        EventListener<web::WebTask> m_listener;
+        async::TaskHolder<geode::utils::web::WebResponse> m_listener;
     };
 
     bool init() {
@@ -163,74 +163,60 @@ private:
         request.bodyString("secret=" + secret + "&targetAccountID=" + targetAccountID);
         request.userAgent("");
 
-        m_fields->m_listener.bind([=](web::WebTask::Event* e) {
-            if (!e->getValue()) {
-                if (e->isCancelled()) {
-                    log::error("The request was cancelled.");
-                } else {
-                    log::error("Request failed.");
+        m_fields->m_listener.spawn(
+            request.post(url),
+            [this, statMenu, notifySuccess](geode::utils::web::WebResponse res) {
+                if (!res.ok()) {
+                    log::error("Request failed with status code: {}", res.code());
+                    return;
                 }
-                
-                return;
-            }
 
-            web::WebResponse* res = e->getValue();
-            if (!res->ok()) {
-                log::error("Request failed with status code: {}", res->code());
-                
-                return;
-            }
+                std::string responseBody = res.string().unwrap();
+                size_t start_pos = responseBody.find(":8:");
+                if (start_pos == std::string::npos) {
+                    log::error("Failed to find ':8:' in response: {}", responseBody);
+                    return;
+                }
 
-            std::string responseBody = res->string().unwrap();
-            size_t start_pos = responseBody.find(":8:");
-            if (start_pos == std::string::npos) {
-                log::error("Failed to find ':8:' in response: {}", responseBody);
-                
-                return;
-            }
+                size_t end_pos = responseBody.find(":", start_pos + 3);
+                if (end_pos == std::string::npos || end_pos <= start_pos + 3) {
+                    log::error("Failed to find valid end position for creator points in response: {}", responseBody);
+                    return;
+                }
 
-            size_t end_pos = responseBody.find(":", start_pos + 3);
-            if (end_pos == std::string::npos || end_pos <= start_pos + 3) {
-                log::error("Failed to find valid end position for creator points in response: {}", responseBody);
-                
-                return;
-            }
+                std::string creatorPointsStr = responseBody.substr(start_pos + 3, end_pos - start_pos - 3);
+                if (!std::all_of(creatorPointsStr.begin(), creatorPointsStr.end(), ::isdigit)) {
+                    log::error("Parsed creator points is not a valid number: {}", creatorPointsStr);
+                    return;
+                }
 
-            std::string creatorPointsStr = responseBody.substr(start_pos + 3, end_pos - start_pos - 3);
-            if (!std::all_of(creatorPointsStr.begin(), creatorPointsStr.end(), ::isdigit)) {
-                log::error("Parsed creator points is not a valid number: {}", creatorPointsStr);
-                
-                return;
-            }
+                int creatorPoints = std::stoi(creatorPointsStr);
 
-            int creatorPoints = std::stoi(creatorPointsStr);
-
-            auto myStatItem = StatsDisplayAPI::getNewItem(
-                "creator-points"_spr,
-                CCSprite::create("cpIcon.png"_spr),
-                creatorPoints,
-                1.f
-            );
-
-            if (statMenu) {
-                auto btn = CCMenuItemSpriteExtra::create(
+                auto myStatItem = StatsDisplayAPI::getNewItem(
+                    "creator-points"_spr,
                     CCSprite::create("cpIcon.png"_spr),
-                    this,
-                    menu_selector(MyGJGarageLayer::refreshCPWrapper)
+                    creatorPoints,
+                    1.f
                 );
-                btn->setID("creator-points-button");
 
-                myStatItem->getChildByID("creator-points-icon"_spr)->setVisible(false);
-                myStatItem->addChild(btn);
-                statMenu->addChild(myStatItem);
-                statMenu->updateLayout();
+                if (statMenu) {
+                    auto btn = CCMenuItemSpriteExtra::create(
+                        CCSprite::create("cpIcon.png"_spr),
+                        this,
+                        menu_selector(MyGJGarageLayer::refreshCPWrapper)
+                    );
+                    btn->setID("creator-points-button");
 
-                if (notifySuccess) {
-                    geode::Notification::create("Creator Points successfully updated.", geode::NotificationIcon::Success, 2.5)->show();
+                    myStatItem->getChildByID("creator-points-icon"_spr)->setVisible(false);
+                    myStatItem->addChild(btn);
+                    statMenu->addChild(myStatItem);
+                    statMenu->updateLayout();
+
+                    if (notifySuccess) {
+                        geode::Notification::create("Creator Points successfully updated.", geode::NotificationIcon::Success, 2.5)->show();
+                    }
                 }
             }
-        });
-
-        m_fields->m_listener.setFilter(request.post(url));
+        );
     }
 };
