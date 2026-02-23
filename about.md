@@ -10,3 +10,8 @@ This mod adds extra stats to the sidebar in the icon kit area! These include:
 - Creator Points (click to refresh)
 - Shards
 - ~~Achievements (soon...)~~
+
+## Credits
+
+- <cp>Alphalaneous</c> for assisting with the achievements count
+- <cr>EVW</c> for the wonderful idea of showing your overall demon keys count (a long time ago)

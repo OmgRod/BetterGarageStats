@@ -58,6 +58,12 @@
 			"default": false,
 			"description": "Shows completed shards.",
 			"enable-if": "show-shards"
+		},
+		"show-achievements": {
+			"name": "Show Achievements",
+			"type": "bool",
+			"default": false,
+			"description": "Shows the amount of achievements you unlocked in comparison to the total number of achievements in-game."
 		}
 	},
 	"resources": {

@@ -29,32 +29,47 @@ public:
         auto poisonShard = StatsDisplayAPI::getNewItem("poison-shards"_spr, CCSprite::createWithSpriteFrameName("poisonShardBig_001.png"), GameStatsManager::sharedState()->getStat("17"), 0.35);
         auto shadowShard = StatsDisplayAPI::getNewItem("shadow-shards"_spr, CCSprite::createWithSpriteFrameName("shadowShardBig_001.png"), GameStatsManager::sharedState()->getStat("16"), 0.35);
         auto lavaShard = StatsDisplayAPI::getNewItem("lava-shards"_spr, CCSprite::createWithSpriteFrameName("lavaShardBig_001.png"), GameStatsManager::sharedState()->getStat("20"), 0.35);
-        // auto bonusShard1 = StatsDisplayAPI::getNewItem("bonus-shards-one"_spr, CCSprite::createWithSpriteFrameName("bonusShardSmall_001.png"), GameStatsManager::sharedState()->getStat("23"), 0.5);
+        
+        int bonusCount1 = std::min({
+            GameStatsManager::sharedState()->getStat("16"),
+            GameStatsManager::sharedState()->getStat("17"),
+            GameStatsManager::sharedState()->getStat("18"),
+            GameStatsManager::sharedState()->getStat("19"),
+            GameStatsManager::sharedState()->getStat("20")
+        });
+        auto bonusShard1 = StatsDisplayAPI::getNewItem("bonus-shards-one"_spr, CCSprite::createWithSpriteFrameName("bonusShardSmall_001.png"), bonusCount1, 0.5);
 
         auto earthShard = StatsDisplayAPI::getNewItem("earth-shards"_spr, CCSprite::createWithSpriteFrameName("shard0201ShardBig_001.png"), GameStatsManager::sharedState()->getStat("23"), 0.35);
         auto bloodShard = StatsDisplayAPI::getNewItem("blood-shards"_spr, CCSprite::createWithSpriteFrameName("shard0202ShardBig_001.png"), GameStatsManager::sharedState()->getStat("24"), 0.35);
         auto metalShard = StatsDisplayAPI::getNewItem("metal-shards"_spr, CCSprite::createWithSpriteFrameName("shard0203ShardBig_001.png"), GameStatsManager::sharedState()->getStat("25"), 0.35);
         auto lightShard = StatsDisplayAPI::getNewItem("light-shards"_spr, CCSprite::createWithSpriteFrameName("shard0204ShardBig_001.png"), GameStatsManager::sharedState()->getStat("26"), 0.35);
         auto soulShard = StatsDisplayAPI::getNewItem("soul-shards"_spr, CCSprite::createWithSpriteFrameName("shard0205ShardBig_001.png"), GameStatsManager::sharedState()->getStat("27"), 0.35);
-        // auto bonusShard2 = StatsDisplayAPI::getNewItem("bonus-shards-two"_spr, CCSprite::createWithSpriteFrameName("bonusShard2Small_001.png"), GameStatsManager::sharedState()->getStat("28"), 0.5);
+        
+        int bonusCount2 = std::min({
+            GameStatsManager::sharedState()->getStat("23"),
+            GameStatsManager::sharedState()->getStat("24"),
+            GameStatsManager::sharedState()->getStat("25"),
+            GameStatsManager::sharedState()->getStat("26"),
+            GameStatsManager::sharedState()->getStat("27")
+        });
+        auto bonusShard2 = StatsDisplayAPI::getNewItem("bonus-shards-two"_spr, CCSprite::createWithSpriteFrameName("bonusShard2Small_001.png"), bonusCount2, 0.5);
 
-        // Get achievement percentage and set it on the label
-        // CCLabelBMFont* achLabel = typeinfo_cast<CCLabelBMFont*>(achievements->getChildByID("achievements-label"_spr));
-        // if (achLabel) {
-        //     achLabel->setString(fmt::format("{}%", this->getAllAchievementsPercent()).c_str());  // Set the achievements percentage
-        // }
+        CCLabelBMFont* achLabel = typeinfo_cast<CCLabelBMFont*>(achievements->getChildByID("achievements-label"_spr));
+        if (achLabel) {
+            achLabel->setString(this->getAllAchievementsString().c_str());
+        }
 
         if (auto statMenu = this->getChildByID("capeling.garage-stats-menu/stats-menu")) {
             if (Mod::get()->getSettingValue<bool>("demons")) statMenu->addChild(demons);
             if (Mod::get()->getSettingValue<bool>("demonKeys")) {
-                // if (Mod::get()->getSettingValue<bool>("complete-demon-keys")) {
-                //     CCLabelBMFont* demonKeyText = typeinfo_cast<CCLabelBMFont*>(demonKeys->getChildByID("demon-keys-label"_spr));
-                //     demonKeyText->setString((std::to_string(GameStatsManager::sharedState()->getStat("21")) + "/" + "i give up lol").c_str()); // GS_20
-                // }
+                if (Mod::get()->getSettingValue<bool>("complete-demon-keys")) { // show current demon keys / overall demon keys
+                    CCLabelBMFont* demonKeyText = typeinfo_cast<CCLabelBMFont*>(demonKeys->getChildByID("demon-keys-label"_spr));
+                    demonKeyText->setString((std::to_string(GameStatsManager::sharedState()->getStat("21")) + "/" + "i give up lol").c_str()); // GS_20
+                }
                 statMenu->addChild(demonKeys);
             };
             if (Mod::get()->getSettingValue<bool>("goldKeys")) statMenu->addChild(goldKeys);
-            // if (Mod::get()->getSettingValue<bool>("achievements")) statMenu->addChild(achievements);
+            if (Mod::get()->getSettingValue<bool>("achievements")) statMenu->addChild(achievements);
             if (Mod::get()->getSettingValue<bool>("show-shards")) {
                 if (Mod::get()->getSettingValue<bool>("show-shards-completed")) {
                     statMenu->addChild(fireShard);
@@ -62,13 +77,13 @@ public:
                     statMenu->addChild(poisonShard);
                     statMenu->addChild(shadowShard);
                     statMenu->addChild(lavaShard);
-                    // statMenu->addChild(bonusShard1);
+                    statMenu->addChild(bonusShard1);
                     statMenu->addChild(earthShard);
                     statMenu->addChild(bloodShard);
                     statMenu->addChild(metalShard);
                     statMenu->addChild(lightShard);
                     statMenu->addChild(soulShard);
-                    // statMenu->addChild(bonusShard2);
+                    statMenu->addChild(bonusShard2);
 
                     if (auto label = typeinfo_cast<CCLabelBMFont*>(fireShard->getChildByID("fire-shards-label"_spr)))
                         if (GameStatsManager::sharedState()->getStat("18") >= 100) label->setColor(ccc3(0, 255, 0));
@@ -80,6 +95,8 @@ public:
                         if (GameStatsManager::sharedState()->getStat("16") >= 100) label->setColor(ccc3(0, 255, 0));
                     if (auto label = typeinfo_cast<CCLabelBMFont*>(lavaShard->getChildByID("lava-shards-label"_spr)))
                         if (GameStatsManager::sharedState()->getStat("20") >= 100) label->setColor(ccc3(0, 255, 0));
+                    if (auto label = typeinfo_cast<CCLabelBMFont*>(bonusShard1->getChildByID("bonus-shards-one-label"_spr)))
+                        if (bonusCount1 >= 100) label->setColor(ccc3(0, 255, 0));
                     if (auto label = typeinfo_cast<CCLabelBMFont*>(earthShard->getChildByID("earth-shards-label"_spr)))
                         if (GameStatsManager::sharedState()->getStat("23") >= 100) label->setColor(ccc3(0, 255, 0));
                     if (auto label = typeinfo_cast<CCLabelBMFont*>(bloodShard->getChildByID("blood-shards-label"_spr)))
@@ -90,20 +107,23 @@ public:
                         if (GameStatsManager::sharedState()->getStat("26") >= 100) label->setColor(ccc3(0, 255, 0));
                     if (auto label = typeinfo_cast<CCLabelBMFont*>(soulShard->getChildByID("soul-shards-label"_spr)))
                         if (GameStatsManager::sharedState()->getStat("27") >= 100) label->setColor(ccc3(0, 255, 0));
+                    if (auto label = typeinfo_cast<CCLabelBMFont*>(bonusShard2->getChildByID("bonus-shards-two-label"_spr)))
+                        if (bonusCount2 >= 100) label->setColor(ccc3(0, 255, 0));
                 } else {
-                    if (GameStatsManager::sharedState()->getStat("18") != 100) statMenu->addChild(fireShard);
-                    if (GameStatsManager::sharedState()->getStat("19") != 100) statMenu->addChild(iceShard);
-                    if (GameStatsManager::sharedState()->getStat("17") != 100) statMenu->addChild(poisonShard);
-                    if (GameStatsManager::sharedState()->getStat("16") != 100) statMenu->addChild(shadowShard);
-                    if (GameStatsManager::sharedState()->getStat("20") != 100) statMenu->addChild(lavaShard);
-                    // statMenu->addChild(bonusShard1);
-                    if (GameStatsManager::sharedState()->getStat("23") != 100) statMenu->addChild(earthShard);
-                    if (GameStatsManager::sharedState()->getStat("24") != 100) statMenu->addChild(bloodShard);
-                    if (GameStatsManager::sharedState()->getStat("25") != 100) statMenu->addChild(metalShard);
-                    if (GameStatsManager::sharedState()->getStat("26") != 100) statMenu->addChild(lightShard);
-                    if (GameStatsManager::sharedState()->getStat("27") != 100) statMenu->addChild(soulShard);
-                    // statMenu->addChild(bonusShard2);
+                    if (GameStatsManager::sharedState()->getStat("18") < 100) statMenu->addChild(fireShard);
+                    if (GameStatsManager::sharedState()->getStat("19") < 100) statMenu->addChild(iceShard);
+                    if (GameStatsManager::sharedState()->getStat("17") < 100) statMenu->addChild(poisonShard);
+                    if (GameStatsManager::sharedState()->getStat("16") < 100) statMenu->addChild(shadowShard);
+                    if (GameStatsManager::sharedState()->getStat("20") < 100) statMenu->addChild(lavaShard);
+                    if (bonusCount1 < 100) statMenu->addChild(bonusShard1);
+                    if (GameStatsManager::sharedState()->getStat("23") < 100) statMenu->addChild(earthShard);
+                    if (GameStatsManager::sharedState()->getStat("24") < 100) statMenu->addChild(bloodShard);
+                    if (GameStatsManager::sharedState()->getStat("25") < 100) statMenu->addChild(metalShard);
+                    if (GameStatsManager::sharedState()->getStat("26") < 100) statMenu->addChild(lightShard);
+                    if (GameStatsManager::sharedState()->getStat("27") < 100) statMenu->addChild(soulShard);
+                    if (bonusCount2 < 100) statMenu->addChild(bonusShard2);
                 }
+                if (Mod::get()->getSettingValue<bool>("show-achievements")) statMenu->addChild(achievements);
             }
             statMenu->updateLayout();
         }
@@ -119,26 +139,31 @@ public:
     }
 
 private:
-    float getAllAchievementsPercent() {
-        float achievementPercent = 0.f;
-        int totalEarned = 0;
-        int totalAchievements = AchievementManager::sharedState()->m_allAchievements->count();
+    // FUNCTION BY ALPHALANEOUS (https://github.com/Alphalaneous/AchievedCount)
+    std::string getAllAchievementsString() {
+        int total = 0;
+		int earned = 0;
 
-		for (int i = 0; i < AchievementManager::sharedState()->m_allAchievements->count(); ++i) {
-			auto achievement = static_cast<cocos2d::CCDictionary*>(AchievementManager::sharedState()->m_allAchievements->objectAtIndex(i));
+		auto am = AchievementManager::sharedState();
 
-			auto achievementID = achievement->valueForKey("id")->getCString();
-
-			if (AchievementManager::sharedState()->isAchievementEarned(achievementID)) {
-				totalEarned++;
+		for (auto d : CCArrayExt<CCObject>(am->m_allAchievements)) {
+			for (const auto& [k, v] : CCDictionaryExt<std::string, CCString*>(static_cast<CCDictionary*>(d))) {
+				if (k == "identifier") {
+					std::string_view str = v->getCString();
+					if (str.starts_with("geometry.ach.world")
+					|| str.starts_with("geometry.ach.subzero")
+					|| str.starts_with("geometry.ach.md")) {
+						continue;
+					}
+					total++;
+					if (am->isAchievementEarned(v->getCString())) {
+						earned++;
+					}
+				}
 			}
 		}
 
-        if (totalAchievements > 0) {
-            achievementPercent = (static_cast<float>(AchievementManager::sharedState()->m_achievementUnlocks->count()) / static_cast<float>(totalAchievements)) * 100;
-        }
-
-        return achievementPercent;
+        return fmt::format("{}/{}", earned, total);
     }
 
     void refreshCPWrapper(CCObject* sender) {
